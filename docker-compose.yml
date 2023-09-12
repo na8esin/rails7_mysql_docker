@@ -9,9 +9,21 @@ services:
   web:
     build: .
     tty: true
+    environment:
+      AWS_REGION: ap-northeast-1
     volumes:
       - .:/usr/src/app
+      - bundle-volume:/usr/local/bundle
+      - .history:/root/.bash_history
     ports:
       - "3000:3000"
     depends_on:
       - db
+  localstack:
+    image: localstack/localstack
+    volumes:
+      - "./localstack/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh"  # ready hook
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+volumes:
+  bundle-volume:
